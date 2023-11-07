@@ -1,3 +1,4 @@
+import argparse
 import socket 
 import sys
 import requests
@@ -14,6 +15,73 @@ from PyPDF2 import PdfReader
 import json as j
 import whois 
 import builtwith
+import hashlib #Leer hash de un archivo y enviarlo a virus total
+from virus_total_apis import PublicApi #Libreria de virus total
+import logging #Imprimie informacion a la consola en un archivo 
+
+logging.basicConfig(filename='myapp.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+def leer_k():
+    """
+    Funcion para leer el archivo que contiene la apikey
+    """
+    try:
+        with open("apikey.txt", "r") as f:
+            return f.read().strip()
+    except FileNotFoundError:
+        print("No existe apikey.txt. Agrega en la carpeta el archivo y coloca tu API_Key en él desde virus total.")
+        return None
+
+def virus_api(file, key):
+"""
+Utiliza api virustotal para analizar si existe malware en un archivo
+"""
+    api = PublicApi(key)
+    """
+    Crear archivo que almacena los resultados
+    """
+    with open(file, "rb") as f:
+        hash_md5 = hashlib.md5(f.read()).hexdigest()
+    
+    resp = api.get_file_report(hash_md5)
+
+    info = ""
+
+    
+    if "response_code" in resp and resp["response_code"] == 200:
+    """
+    Revisar si el resultado ha sido recibido o haya conexion
+    """
+        if "results" in resp:
+            msg = resp["results"].get("verbose_msg", "...")
+            info += f'Verbose message: {msg}\n'
+
+            if "positives" in resp["results"]:
+                if resp["results"]["positives"] > 0:
+                    info += "Archivo malicioso\n"
+                else:
+                    info += "Archivo seguro\n"
+            """
+            Contenido que destacaremos del dicciconario en un informe  
+            """
+            sha1 = resp["results"].get("sha1", "sin datos")
+            sha256 = resp["results"].get("sha256", "sin datos")
+            fecha = resp["results"].get("scan_date", "sin datos")
+            total = resp["results"].get("total", "sin datos")
+            permalink = resp["results"].get("permalink", "sin datos")
+
+            info += f'SHA1: {sha1}\n'
+            info += f'SHA256: {sha256}\n'
+            info += f'Fecha escaneo: {fecha}\n'
+            info += f'Motores de escaneo usados: {total}\n'
+            info += f'Enlace al informe completo: {permalink}\n'
+
+        else:
+            info += "Sin resultados.\n"
+    else:
+        info += "No fue posible conectar.\n"
+    
+    return info
 
 def eliminarArchivosPrevios():
     """ 
