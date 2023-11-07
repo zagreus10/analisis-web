@@ -33,9 +33,9 @@ def leer_k():
         return None
 
 def virus_api(file, key):
-"""
-Utiliza api virustotal para analizar si existe malware en un archivo
-"""
+    """
+    Utiliza api virustotal para analizar si existe malware en un archivo
+    """
     api = PublicApi(key)
     """
     Crear archivo que almacena los resultados
@@ -49,9 +49,9 @@ Utiliza api virustotal para analizar si existe malware en un archivo
 
     
     if "response_code" in resp and resp["response_code"] == 200:
-    """
-    Revisar si el resultado ha sido recibido o haya conexion
-    """
+        """
+        Revisar si el resultado ha sido recibido o haya conexion
+        """
         if "results" in resp:
             msg = resp["results"].get("verbose_msg", "...")
             info += f'Verbose message: {msg}\n'
