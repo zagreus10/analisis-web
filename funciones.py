@@ -31,7 +31,7 @@ def leer_k():
         with open("apikey.txt", "r") as f:
             return f.read().strip()
     except FileNotFoundError:
-        print("No existe apikey.txt. Agrega en la carpeta el archivo y coloca tu API_Key en él desde virus total.")
+        logging.info("No existe apikey.txt. Agrega en la carpeta el archivo y coloca tu API_Key en él desde virus total.")
         return None
 
 def virus_api(file, key):
@@ -242,7 +242,7 @@ def descargarImagenes(url):
                 pass
         
     except:
-        print("Error al intentar descargar las imagenes")
+        logging.error("Error al intentar descargar las imagenes")
         pass
     
     analizarImagenes()
@@ -284,7 +284,7 @@ def descargarPdfs(url):
                 pass
 
     except:
-        print("Error al intentar descargar los archivos")
+        logging.error("Error al intentar descargar los archivos")
         pass
     
     analizarPdfs(url)
@@ -394,4 +394,4 @@ def investigacion():
     try:
         subprocess.run(["powershell", "-File", script_path], check=True)
     except subprocess.CalledProcessError as e:
-        print(f"Error al ejecutar el script de PowerShell: {e}")
+        logging.error(f"Error al ejecutar el script de PowerShell: {e}")
